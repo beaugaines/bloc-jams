@@ -3,15 +3,6 @@ body.landing {
   background-color: rgb(58,23,63);
 }
 
-nav.page-nav {
-  padding: 0.5rem;
-  background-color: rgb(101,18,95);
-}
-
-nav.page-nav .logo {
-  position: relative;
-  left: 2rem;
-}
 
 .hero-content {
   position: relative;
