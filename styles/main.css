@@ -57,11 +57,11 @@ nav.page-nav .links-container {
   color: rgb(233,50,117);
 }
 
-/*.links-container .navbar-link:active {
+.links-container .navbar-link:active {
   color: rgb(233,50,117);
-  background-color: teal;
+  background-color: white;
 }
-*/
+
 
 .container {
   margin: 0 auto;
