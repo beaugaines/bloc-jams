@@ -57,15 +57,14 @@ nav.page-nav .links-container {
   color: rgb(233,50,117);
 }
 
-/*.links-container .navbar-link:active {
-  color: rgb(233,50,117);
-  background-color: teal;
-}
-*/
 
 .container {
   margin: 0 auto;
   max-width: 64rem;
+}
+
+.container.narrow {
+  max-width: 56rem;
 }
 
 
