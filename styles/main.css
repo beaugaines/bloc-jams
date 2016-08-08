@@ -1,5 +1,3 @@
-/* what does this do */
-
 *, *:before, *:after {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -67,12 +65,14 @@ nav.page-nav .links-container {
 
 .container {
   margin: 0 auto;
-  max-width: 64rem;j
+  max-width: 64rem;
 }
 
 
 /* Medium and small screens (640px)*/
 @media (min-width: 40rem) {
+  /* b/c rem is 16px on most browsers - and that is small - it is a good
+  idea to use a slightly larger font size */
   html { font-size: 112%; }
 
   .column {

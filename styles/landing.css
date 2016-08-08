@@ -30,10 +30,14 @@ body.landing {
 }
 
 .selling-points {
+  /* this position doesn't seem to do anything */
+  position: relative;
   /*display: flex;*/
 }
 
 .point {
+  /* this position doesn't seem to do anything */
+  position: relative;
   padding: 2rem;
   text-align: center;
 }
