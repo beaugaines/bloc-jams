@@ -1,0 +1,4 @@
+- universal selector 'performs poorly on large pages'.  how poorly?
+  have you ever seen any evidence of this in your projects?
+
+- optional position: relative rules in landing.css?
