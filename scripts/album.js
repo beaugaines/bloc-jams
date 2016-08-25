@@ -30,6 +30,23 @@ var albumMarconi = {
   ]
 };
 
+
+var albumGoldberg = {
+  title: 'The Goldberg Variations',
+  artist: 'Rosalyn Tureck',
+  label: 'VAI',
+  year: '1984',
+  albumArtUrl: 'assets/images/album_covers/goldberg.jpg',
+  songs: [
+    { title: 'Aria', duration: '4:26' },
+    { title: 'Variation 1', duration: '3:14' },
+    { title: 'Variation 2', duration: '5:01' },
+    { title: 'Variation 3', duration: '3:21'},
+    { title: 'Variation 4', duration: '2:15'}
+  ]
+};
+
+
 var createSongRow = function (songNumber, songName, songLength) {
   return (
     '<tr class="album-view-song-item">' +
@@ -61,4 +78,12 @@ var setCurrentAlbum = function (album) {
 
 window.onload = function () {
   setCurrentAlbum(albumPicasso);
+
+  var albums = [albumPicasso, albumMarconi, albumGoldberg];
+  var cover = document.getElementsByClassName('album-cover-art')[0];
+  var currentIndex = 0;
+  cover.addEventListener('click', function () {
+    currentIndex += 1;
+    setCurrentAlbum(albums[currentIndex % 3]);
+  })
 };
