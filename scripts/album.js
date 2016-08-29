@@ -70,16 +70,6 @@ var findParentByClassName = function (element, className) {
 };
 
 
-// var getSongItem = function (element) {
-//   switch(element.className) {
-//     case 'song-item-number':
-//       return element;
-//     default:
-//       return getSongItem(findParentByClassName('song-item-number'));
-//   }
-// };
-//
-
 var getSongItem = function(element) {
     switch (element.className) {
         case 'album-song-button':
