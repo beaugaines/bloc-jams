@@ -9,10 +9,24 @@ var currentAlbum = null;
 var currentlyPlayingSongNumber = null;
 var currentSongIndex = null;
 var currentSongFromAlbum = null;
-var currentSongPaused = false;
+var currentSoundFile = null;
 
 var $previousButton = $('.main-controls .previous');
 var $nextButton = $('.main-controls .next');
+
+
+var setSong = function (num) {
+  if (currentSoundFile) {
+    currentSoundFile.stop();
+  }
+  currentSongFromAlbum = currentAlbum.songs[parseInt(num) - 1];
+  currentSoundFile = new buzz.sound(currentSongFromAlbum.audioUrl, {
+    formats: ['mp3'],
+    preload: true,
+    autoplay: true
+  });
+};
+
 
 
 var createSongRow = function (songNumber, songName, songLength) {
@@ -52,6 +66,7 @@ var createSongRow = function (songNumber, songName, songLength) {
     $('.main-controls .play-pause').html(playerBarPauseButton);
   };
 
+
   var clickHandler = function () {
 
     var $songNumberCell = $(this).find('.song-item-number');
@@ -60,26 +75,28 @@ var createSongRow = function (songNumber, songName, songLength) {
     if(currentlyPlayingSongNumber === null) {
       $songNumberCell.html(pauseButtonTemplate);
       currentlyPlayingSongNumber = songNumber;
+      setSong(songNumber);
       updatePlayerBarSong();
     } else if (currentlyPlayingSongNumber === songNumber) {
-      if (currentSongPaused === true) {
-        currentSongPaused = false;
-        $songNumberCell.html(playButtonTemplate);
+      if (currentSoundFile.isPaused() === true) {
+        currentSoundFile.play();
+        $songNumberCell.html(pauseButtonTemplate);
         $('.main-controls .play-pause').html(playerBarPlayButton);
       } else {
-        currentSongPaused = true;
-        $songNumberCell.html(pauseButtonTemplate);
+        currentSoundFile.pause();
+        $songNumberCell.html(playButtonTemplate);
         $('.main-controls .play-pause').html(playerBarPauseButton);
       }
     } else if (currentlyPlayingSongNumber !== songNumber) {
       $('[data-song-number="' + currentlyPlayingSongNumber + '"]').html(currentlyPlayingSongNumber);
       $songNumberCell.html(pauseButtonTemplate);
       currentlyPlayingSongNumber = songNumber;
+      setSong(songNumber);
       updatePlayerBarSong();
     }
   };
 
-  // you can attache event listners to dynamically created elements
+  // you can attach event listners to dynamically created elements
   // before adding them to the DOM
   $row.click(clickHandler);
   $row.hover(onHover, offHover);
@@ -126,6 +143,8 @@ var nextSong = function () {
   currentlyPlayingSongNumber = (currentSongIndex + 1).toString();
   currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
 
+  setSong(currentlyPlayingSongNumber);
+
   $('.currently-playing .song-name').text(currentSongFromAlbum.title);
   $('.currently-playing .artist-name').text(currentAlbum.artist);
   $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + ' - ' + currentAlbum.artist);
@@ -148,6 +167,9 @@ var previousSong = function () {
   currentSongIndex = ((parseInt(currentlyPlayingSongNumber) + albumLength) - 2) % albumLength;
   currentlyPlayingSongNumber = (currentSongIndex + 1).toString();
   currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
+
+  setSong(currentlyPlayingSongNumber);
+
   $('.currently-playing .song-name').text(currentSongFromAlbum.title);
   $('.currently-playing .artist-name').text(currentAlbum.artist);
   $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + ' - ' + currentAlbum.artist);
