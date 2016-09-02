@@ -7,8 +7,12 @@ var playerBarPauseButton = '<span class="ion-pause"></span>';
 // does this need to be set to null?  Can't it just be declared?
 var currentAlbum = null;
 var currentlyPlayingSongNumber = null;
+var currentSongIndex = null;
 var currentSongFromAlbum = null;
 var currentSongPaused = false;
+
+var $previousButton = $('.main-controls .previous');
+var $nextButton = $('.main-controls .next');
 
 
 var createSongRow = function (songNumber, songName, songLength) {
@@ -46,7 +50,7 @@ var createSongRow = function (songNumber, songName, songLength) {
     $('.currently-playing .artist-name').text(currentArtist);
     $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum + ' - ' + currentArtist);
     $('.main-controls .play-pause').html(playerBarPauseButton);
-  }
+  };
 
   var clickHandler = function () {
 
@@ -109,10 +113,29 @@ var trackIndex = function (album, song) {
   return album.songs.indexOf(song);
 };
 
-// var nextSong = function (arguments) {}
+var nextSong = function () {
+  var $currentSongRow = $('[data-song-number="' + currentlyPlayingSongNumber + '"]').parent();
+  if (currentlyPlayingSongNumber == currentAlbum.songs.length) {
+    var $nextSongRow = $($('.album-view-song-item')[0]);
+  } else {
+    var $nextSongRow = $currentSongRow.next('tr');
+  }
+
+  currentSongIndex = (parseInt(currentlyPlayingSongNumber)) % currentAlbum.songs.length;
+  currentlyPlayingSongNumber = (currentSongIndex + 1).toString();
+  currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
+  $('.currently-playing .song-name').text(currentSongFromAlbum.title);
+  $('.currently-playing .artist-name').text(currentAlbum.artist);
+  $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + ' - ' + currentAlbum.artist);
+  $('.main-controls .play-pause').html(playerBarPauseButton);
+
+  $currentSongRow.find('.song-item-number').html($currentSongRow.find('.song-item-number').attr('data-song-number'));
+  $nextSongRow.find('.song-item-number').html(pauseButtonTemplate);
+};
 
 
 
 $(document).ready(function () {
   setCurrentAlbum(albumPicasso);
+  $nextButton.click(nextSong);
 });
