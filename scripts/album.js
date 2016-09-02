@@ -114,16 +114,18 @@ var trackIndex = function (album, song) {
 };
 
 var nextSong = function () {
+  var albumLength = currentAlbum.songs.length;
   var $currentSongRow = $('[data-song-number="' + currentlyPlayingSongNumber + '"]').parent();
-  if (currentlyPlayingSongNumber == currentAlbum.songs.length) {
+  if (currentlyPlayingSongNumber == albumLength) {
     var $nextSongRow = $($('.album-view-song-item')[0]);
   } else {
     var $nextSongRow = $currentSongRow.next('tr');
   }
 
-  currentSongIndex = (parseInt(currentlyPlayingSongNumber)) % currentAlbum.songs.length;
+  currentSongIndex = (parseInt(currentlyPlayingSongNumber)) % albumLength;
   currentlyPlayingSongNumber = (currentSongIndex + 1).toString();
   currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
+
   $('.currently-playing .song-name').text(currentSongFromAlbum.title);
   $('.currently-playing .artist-name').text(currentAlbum.artist);
   $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + ' - ' + currentAlbum.artist);
@@ -133,9 +135,32 @@ var nextSong = function () {
   $nextSongRow.find('.song-item-number').html(pauseButtonTemplate);
 };
 
+var previousSong = function () {
+  var albumLength = currentAlbum.songs.length;
+
+  var $currentSongRow = $('[data-song-number="' + currentlyPlayingSongNumber + '"]').parent();
+  if (currentlyPlayingSongNumber == 1) {
+    var $prevSongRow = $($('.album-view-song-item').slice(-1));
+  } else {
+    var $prevSongRow = $currentSongRow.prev('tr');
+  }
+
+  currentSongIndex = ((parseInt(currentlyPlayingSongNumber) + albumLength) - 2) % albumLength;
+  currentlyPlayingSongNumber = (currentSongIndex + 1).toString();
+  currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
+  $('.currently-playing .song-name').text(currentSongFromAlbum.title);
+  $('.currently-playing .artist-name').text(currentAlbum.artist);
+  $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + ' - ' + currentAlbum.artist);
+  $('.main-controls .play-pause').html(playerBarPauseButton);
+
+  $currentSongRow.find('.song-item-number').html($currentSongRow.find('.song-item-number').attr('data-song-number'));
+  $prevSongRow.find('.song-item-number').html(pauseButtonTemplate);
+}
+
 
 
 $(document).ready(function () {
   setCurrentAlbum(albumPicasso);
   $nextButton.click(nextSong);
+  $previousButton.click(previousSong);
 });
