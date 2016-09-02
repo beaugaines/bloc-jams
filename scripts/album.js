@@ -10,6 +10,7 @@ var currentlyPlayingSongNumber = null;
 var currentSongIndex = null;
 var currentSongFromAlbum = null;
 var currentSoundFile = null;
+var currentVolume = null;
 
 var $previousButton = $('.main-controls .previous');
 var $nextButton = $('.main-controls .next');
@@ -25,8 +26,8 @@ var setSong = function (num) {
     preload: true,
     autoplay: true
   });
+  currentVolume = currentVolume || currentSoundFile.getVolume();
 };
-
 
 
 var createSongRow = function (songNumber, songName, songLength) {
@@ -94,6 +95,11 @@ var createSongRow = function (songNumber, songName, songLength) {
       setSong(songNumber);
       updatePlayerBarSong();
     }
+
+    $('.volume').find('.fill').css({width: currentVolume});
+    $('.volume').find('.thumb').css({left: currentVolume});
+
+    updateSeekBarWhileSongPlays();
   };
 
   // you can attach event listners to dynamically created elements
@@ -126,8 +132,82 @@ var setCurrentAlbum = function (album) {
   }
 };
 
-var trackIndex = function (album, song) {
-  return album.songs.indexOf(song);
+var updateSeekBarWhileSongPlays = function () {
+  if (currentSoundFile) {
+    currentSoundFile.bind('timeupdate', function (event) {
+      var seekBarFillRatio = this.getTime() / this.getDuration();
+      var $seekBar = $('.seek-control .seek-bar');
+      updateSeekPercentage($seekBar, seekBarFillRatio);
+    });
+  }
+}
+
+var updateSeekPercentage = function ($seekBar, seekBarFillRatio) {
+  var offsetXPercent = seekBarFillRatio * 100;
+
+  offsetXPercent = Math.max(0, offsetXPercent);
+  offsetXPercent = Math.min(offsetXPercent, 100);
+
+  var percentageString = offsetXPercent + '%';
+  $seekBar.find('.fill').width(percentageString);
+  $seekBar.find('.thumb').css({left: percentageString});
+};
+
+var seek = function (time) {
+  if (currentSoundFile) {
+    currentSoundFile.setTime(time);
+  }
+}
+
+var setVolume = function (level) {
+  if (currentSoundFile) {
+    currentVolume = currentSoundFile.setVolume(level).getVolume();
+  }
+}
+
+var setupSeekBars = function () {
+  var $seekBars = $('.player-bar .seek-bar');
+
+  $seekBars.click(function (event) {
+    var parentClass = $(this).parent().attr('class');
+    var offsetX = event.pageX - $(this).offset().left;
+    var barWidth = $(this).width();
+
+    var seekBarFillRatio = offsetX / barWidth;
+
+    if (parentClass.match(/volume/)) {
+      setVolume(Math.round(seekBarFillRatio * 100));
+    } else {
+      seek(currentSoundFile.getDuration() * seekBarFillRatio);
+    }
+    updateSeekPercentage($(this), seekBarFillRatio);
+  });
+
+  // this attaches the mousedown callback to all seekbars
+  $seekBars.find('.thumb').mousedown(function (event) {
+    var $seekBar = $(this).parent();
+
+    // we use bind b/c it allows you to namespace event listeners
+    $(document).bind('mousemove.thumb', function (event) {
+      // this generates a lot of errors: album.js:157 Uncaught ReferenceError: $seekbar is not defined
+      var offsetX = event.pageX - $seekBar.offset().left;
+      var barWidth = $seekBar.width();
+      var seekBarFillRatio = offsetX / barWidth;
+      if (parentClass.match(/volume/)) {
+        setVolume(Math.round(seekBarFillRatio * 100));
+      } else {
+        seek(currentSoundFile.getDuration() * seekBarFillRatio);
+      }
+
+      updateSeekPercentage($seekBar, seekBarFillRatio);
+    });
+
+    $(document).bind('mouseup.thumb', function () {
+      $(document).unbind('mousemove.thumb');
+      $(document).unbind('mouseup.thumb');
+    });
+
+  })
 };
 
 var nextSong = function () {
@@ -144,6 +224,7 @@ var nextSong = function () {
   currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
 
   setSong(currentlyPlayingSongNumber);
+  updateSeekBarWhileSongPlays();
 
   $('.currently-playing .song-name').text(currentSongFromAlbum.title);
   $('.currently-playing .artist-name').text(currentAlbum.artist);
@@ -169,6 +250,7 @@ var previousSong = function () {
   currentSongFromAlbum = currentAlbum.songs[currentSongIndex];
 
   setSong(currentlyPlayingSongNumber);
+  updateSeekBarWhileSongPlays();
 
   $('.currently-playing .song-name').text(currentSongFromAlbum.title);
   $('.currently-playing .artist-name').text(currentAlbum.artist);
@@ -183,6 +265,7 @@ var previousSong = function () {
 
 $(document).ready(function () {
   setCurrentAlbum(albumPicasso);
+  setupSeekBars();
   $nextButton.click(nextSong);
   $previousButton.click(previousSong);
 });
